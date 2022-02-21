@@ -5,10 +5,10 @@
     </div>
     <div class="vdatetime-time-picker_container">
       <div class="vdatetime-time-picker__list vdatetime-time-picker__list--hours" ref="hourList">
-        <div class="vdatetime-time-picker__item" :key="i" v-for="(hour, i) in hours" @click="selectHour(hour)" :class="{'vdatetime-time-picker__item--selected': hour.selected, 'vdatetime-time-picker__item--disabled': hour.disabled}">{{ formatHour(hour.number) }}</div>
+        <div class="vdatetime-time-picker__item" :key="i" v-for="(hour, i) in hours" @click="selectHour(hour)" :class="{'vdatetime-time-picker__item--selected': i === 0, 'vdatetime-time-picker__item--disabled': hour.disabled}">{{ formatHour(hour.number) }}</div>
       </div>
       <div class="vdatetime-time-picker__list vdatetime-time-picker__list--minutes" ref="minuteList">
-        <div class="vdatetime-time-picker__item" :key="i" v-for="(minute, i) in minutes" @click="selectMinute(minute)" :class="{'vdatetime-time-picker__item--selected': minute.selected, 'vdatetime-time-picker__item--disabled': minute.disabled}">{{ minute.number }}</div>
+        <div class="vdatetime-time-picker__item" :key="i" v-for="(minute, i) in minutes" @click="selectMinute(minute)" :class="{'vdatetime-time-picker__item--selected': i === 0, 'vdatetime-time-picker__item--disabled': minute.disabled}">{{ minute.number }}</div>
       </div>
       <div class="vdatetime-time-picker__list vdatetime-time-picker__list--suffix" ref="suffixList" v-if="use12Hour">
         <div class="vdatetime-time-picker__item" @click="selectSuffix('am')" :class="{'vdatetime-time-picker__item--selected': hour < 12}">am</div>
@@ -219,20 +219,20 @@ export default {
 }
 
 .vdatetime-time-picker__item {
-  padding: 10px 0;
-  font-size: 20px;
+  height: 24px;
+  line-height: 24px;
+  margin-bottom: 8px;
+  font-size: 12px;
   text-align: center;
   cursor: pointer;
   transition: font-size .3s;
 }
 
-.vdatetime-time-picker__item:hover {
-  font-size: 32px;
-}
-
 .vdatetime-time-picker__item--selected {
-  color: #3f51b5;
-  font-size: 32px;
+  color: #333;
+  background: rgba(66,123,255,0.1);
+
+  // font-size: 32px;
 }
 
 .vdatetime-time-picker__item--disabled {

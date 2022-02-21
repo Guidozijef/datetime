@@ -166,15 +166,16 @@ export default {
 .vdatetime-calendar__month__weekday,
 .vdatetime-calendar__month__day {
   display: inline-block;
-  width: 24px;
+  width: 22px;
   height: 22px;
   line-height: 22px;
   text-align: center;
-  font-size: 14px;
-  font-weight: 300;
+  font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
   margin-right: 8px;
   margin-bottom: 8px;
+  color: #333;
   &:nth-child(7n){
     margin-right: 0px;
   }
@@ -216,6 +217,7 @@ export default {
   &:hover > span > span {
     color: #fff;
     background: #427BFF;
+    border-radius: 2px;
   }
 }
 
@@ -239,7 +241,7 @@ export default {
   .button_text{
     cursor: pointer;
     color: #427BFF;
-    font-size: 14px;
+    font-size: 12px;
   }
 }
 </style>

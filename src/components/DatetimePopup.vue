@@ -298,7 +298,7 @@ export default {
     height: 304px;
     .calendar-container{
       float: left;
-      width: 250px;
+      width: 234px;
     }
     .time-container{
       float: left;
