@@ -1,0 +1,245 @@
+<template>
+  <div class="vdatetime-calendar">
+    <div class="vdatetime-calendar__navigation">
+      <div class="vdatetime-calendar__navigation--previous" @click="previousMonth">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 61.3 102.8">
+          <path fill="none" stroke="#444" stroke-width="14" stroke-miterlimit="10" d="M56.3 97.8L9.9 51.4 56.3 5"/>
+        </svg>
+      </div>
+      <div class="vdatetime-calendar__current--month">{{ `${newYear}年` }} {{ monthName }}</div>
+      <div class="vdatetime-calendar__navigation--next" @click="nextMonth">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 61.3 102.8">
+          <path fill="none" stroke="#444" stroke-width="14" stroke-miterlimit="10" d="M56.3 97.8L9.9 51.4 56.3 5"/>
+        </svg>
+      </div>
+    </div>
+    <div class="vdatetime-calendar__month">
+      <div class="vdatetime-calendar__month__weekday" v-for="weekday in weekdays" :key="weekday">{{ weekday }}</div>
+      <div class="vdatetime-calendar__month__day" :key="day.number" v-for="day in days" @click="selectDay(day)" :class="{'vdatetime-calendar__month__day--selected': day.selected, 'vdatetime-calendar__month__day--disabled': day.disabled}">
+        <span><span>{{ day.number }}</span></span>
+      </div>
+    </div>
+    <div class="vdatetime-calendar__button">
+      <span class="button_text">今天</span>
+      <span class="button_text">时间</span>
+    </div>
+  </div>
+</template>
+
+<script>
+import { DateTime } from 'luxon'
+import { monthDayIsDisabled, monthDays, months, weekdays } from './util'
+
+export default {
+  props: {
+    year: {
+      type: Number,
+      required: true
+    },
+    month: {
+      type: Number,
+      required: true
+    },
+    day: {
+      type: Number,
+      default: null
+    },
+    disabled: {
+      type: Array
+    },
+    minDate: {
+      type: DateTime,
+      default: null
+    },
+    maxDate: {
+      type: DateTime,
+      default: null
+    },
+    weekStart: {
+      type: Number,
+      default: 1
+    }
+  },
+
+  data () {
+    return {
+      newDate: DateTime.fromObject({ year: this.year, month: this.month,  }),// zone: 'UTC'
+      weekdays: weekdays(this.weekStart),
+      months: months()
+    }
+  },
+
+  computed: {
+    newYear () {
+      return this.newDate.year
+    },
+    newMonth () {
+      return this.newDate.month
+    },
+    monthName () {
+      return this.months[this.newMonth - 1]
+    },
+    days () {
+      return monthDays(this.newYear, this.newMonth, this.weekStart).map(day => ({
+        number: day,
+        selected: day && this.year === this.newYear && this.month === this.newMonth && this.day === day,
+        disabled: !day || monthDayIsDisabled(this.minDate, this.maxDate, this.newYear, this.newMonth, day)
+      }))
+    }
+  },
+
+  methods: {
+    selectDay (day) {
+      if (day.disabled) {
+        return
+      }
+
+      this.$emit('change', this.newYear, this.newMonth, day.number)
+    },
+    previousMonth () {
+      this.newDate = this.newDate.minus({ months: 1 })
+    },
+    nextMonth () {
+      this.newDate = this.newDate.plus({ months: 1 })
+    }
+  }
+}
+</script>
+
+<style lang="scss">
+.vdatetime-calendar__navigation,
+.vdatetime-calendar__navigation * {
+  box-sizing: border-box;
+}
+
+.vdatetime-calendar__navigation {
+  height: 40px;
+  position: relative;
+  line-height: 40px;
+  padding: 0 30px;
+  width: 100%;
+  border-bottom: 1px solid #F5F5F5;
+}
+
+.vdatetime-calendar__navigation--previous,
+.vdatetime-calendar__navigation--next {
+  position: absolute;
+  top: 0;
+  padding: 0 5px;
+  width: 18px;
+  cursor: pointer;
+
+  &.svg {
+    width: 8px;
+    height: 13px;
+
+    &.path {
+      transition: stroke .3s;
+    }
+  }
+
+  &:hover svg path {
+    stroke: #888;
+  }
+}
+
+.vdatetime-calendar__navigation--previous {
+  left: 25px;
+}
+
+.vdatetime-calendar__navigation--next {
+  right: 25px;
+  transform: scaleX(-1);
+}
+
+.vdatetime-calendar__current--month {
+  text-align: center;
+  text-transform: capitalize;
+}
+
+.vdatetime-calendar__month {
+  padding: 10px 16px;
+  transition: height .2s;
+  height: 224px;
+}
+
+.vdatetime-calendar__month__weekday,
+.vdatetime-calendar__month__day {
+  display: inline-block;
+  width: 24px;
+  height: 22px;
+  line-height: 22px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 300;
+  cursor: pointer;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  &:nth-child(7n){
+    margin-right: 0px;
+  }
+
+  & > span {
+    display: block;
+    width: 100%;
+    position: relative;
+    height: 0;
+    padding: 0 0 100%;
+    overflow: hidden;
+
+    & > span {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      border: 0;
+      // border-radius: 50%;
+      transition: background-color .3s, color .3s;
+    }
+  }
+}
+
+.vdatetime-calendar__month__weekday {
+  font-weight: bold;
+}
+
+.vdatetime-calendar__month__day:hover > span > span {
+  background: #eee;
+}
+
+.vdatetime-calendar__month__day--selected {
+  & > span > span,
+  &:hover > span > span {
+    color: #fff;
+    background: #427BFF;
+  }
+}
+
+.vdatetime-calendar__month__day--disabled {
+  opacity: 0.4;
+  cursor: default;
+
+  &:hover > span > span {
+    color: inherit;
+    background: transparent;
+  }
+}
+
+.vdatetime-calendar__button{
+  height: 40px;
+  border-top: 1px solid #F5F5F5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  .button_text{
+    cursor: pointer;
+    color: #427BFF;
+    font-size: 14px;
+  }
+}
+</style>
