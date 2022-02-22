@@ -1,8 +1,14 @@
 <template>
-  <div :class="{'vdatetime-time-picker': true, 'vdatetime-time-picker__with-suffix': use12Hour}">
+  <div :class="{'vdatetime-time-picker': true, 'vdatetime-time-picker__with-suffix': true }">
     <div class="vdatetime-time-picker_title">
-      <input class="vdatetime-time-input" type="text">
+      <div class="vdatetime-time-input-box">
+        <input class="vdatetime-time-input" type="text" :value="dateValue" >
+        <span class="icon-clear">
+          <svg version="1.1" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M-73.14-73.14h1170.28v1170.28h-1170.28z" fill="#ffffff" p-id="0"></path><path d="M512 0c283.06 0 512 228.94 512 512s-228.94 512-512 512-512-228.94-512-512 228.94-512 512-512z m-84.11 378.88a44.62 44.62 0 0 0-62.18 0c-16.82 16.82-16.82 44.62 0 61.44l84.12 84.85-84.12 84.11a44.62 44.62 0 0 0 0 62.17c16.82 16.82 44.62 16.82 62.18 0l84.11-84.84 84.11 84.84c16.82 16.82 44.62 16.82 62.18 0a44.62 44.62 0 0 0 0-62.17l-84.12-84.11 84.12-84.85c16.82-16.82 16.82-44.62 0-61.44a44.62 44.62 0 0 0-62.18 0l-84.11 84.11z" fill="#dddddd" p-id="1"></path></svg>
+        </span>
+      </div>
     </div>
+    <div class="date-active"></div>
     <div class="vdatetime-time-picker_container">
       <div class="vdatetime-time-picker__list vdatetime-time-picker__list--hours" ref="hourList">
         <div class="vdatetime-time-picker__item" :key="i" v-for="(hour, i) in hours" @click="selectHour(hour)" :class="{'vdatetime-time-picker__item--selected': i === 0, 'vdatetime-time-picker__item--disabled': hour.disabled}">{{ formatHour(hour.number) }}</div>
@@ -10,13 +16,12 @@
       <div class="vdatetime-time-picker__list vdatetime-time-picker__list--minutes" ref="minuteList">
         <div class="vdatetime-time-picker__item" :key="i" v-for="(minute, i) in minutes" @click="selectMinute(minute)" :class="{'vdatetime-time-picker__item--selected': i === 0, 'vdatetime-time-picker__item--disabled': minute.disabled}">{{ minute.number }}</div>
       </div>
-      <div class="vdatetime-time-picker__list vdatetime-time-picker__list--suffix" ref="suffixList" v-if="use12Hour">
-        <div class="vdatetime-time-picker__item" @click="selectSuffix('am')" :class="{'vdatetime-time-picker__item--selected': hour < 12}">am</div>
-        <div class="vdatetime-time-picker__item" @click="selectSuffix('pm')" :class="{'vdatetime-time-picker__item--selected': hour >= 12}">pm</div>
+      <div class="vdatetime-time-picker__list vdatetime-time-picker__list--suffix" ref="suffixList">
+        <div class="vdatetime-time-picker__item" :key="i" v-for="(second, i) in seconds" @click="selectSecond(second)" :class="{'vdatetime-time-picker__item--selected': i === 0, 'vdatetime-time-picker__item--disabled': second.disabled}">{{ second.number }}</div>
       </div>
     </div>
     <div class="vdatetime-time-picker__button">
-      <button class="button">按钮</button>
+      <button class="button" @click="confirm">按钮</button>
     </div>
   </div>
 </template>
@@ -26,6 +31,18 @@ import { hours, minutes, pad, timeComponentIsDisabled } from './util'
 
 export default {
   props: {
+    year: {
+      type: Number,
+      required: true
+    },
+    month: {
+      type: Number,
+      required: true
+    },
+    day: {
+      type: Number,
+      required: true
+    },
     hour: {
       type: Number,
       required: true
@@ -34,17 +51,13 @@ export default {
       type: Number,
       required: true
     },
+    second: {
+      type: Number,
+      required: true
+    },
     use12Hour: {
       type: Boolean,
       default: false
-    },
-    hourStep: {
-      type: Number,
-      default: 1
-    },
-    minuteStep: {
-      type: Number,
-      default: 1
     },
     minTime: {
       type: String,
@@ -57,8 +70,11 @@ export default {
   },
 
   computed: {
+    dateValue () {
+      return `${pad(this.year)}-${pad(this.month)}-${pad(this.day)} ${pad(this.hour)}:${pad(this.minute)}:${pad(this.second)}`
+    },
     hours () {
-      return hours(this.hourStep).filter(hour => {
+      return hours().filter(hour => {
         if (!this.use12Hour) {
           return true
         } else {
@@ -75,10 +91,17 @@ export default {
       }))
     },
     minutes () {
-      return minutes(this.minuteStep).map(minute => ({
+      return minutes().map(minute => ({
         number: pad(minute),
         selected: minute === this.minute,
         disabled: timeComponentIsDisabled(this.minMinute, this.maxMinute, minute)
+      }))
+    },
+    seconds () {
+      return minutes().map(second => ({
+        number: pad(second),
+        selected: second === this.second,
+        disabled: timeComponentIsDisabled(this.minMinute, this.maxMinute, second)
       }))
     },
     minHour () {
@@ -110,18 +133,25 @@ export default {
 
       this.$emit('change', { minute: parseInt(minute.number) })
     },
-    selectSuffix (suffix) {
-      if (suffix === 'am') {
-        if (this.hour >= 12) {
-          this.$emit('change', { hour: parseInt(this.hour - 12), suffixTouched: true })
-        }
+    selectSecond (second) {
+      if (second.disabled) {
+        return
       }
-      if (suffix === 'pm') {
-        if (this.hour < 12) {
-          this.$emit('change', { hour: parseInt(this.hour + 12), suffixTouched: true })
-        }
-      }
+
+      this.$emit('change', { second: parseInt(second.number) })
     },
+    // selectSuffix (suffix) {
+    //   if (suffix === 'am') {
+    //     if (this.hour >= 12) {
+    //       this.$emit('change', { hour: parseInt(this.hour - 12), suffixTouched: true })
+    //     }
+    //   }
+    //   if (suffix === 'pm') {
+    //     if (this.hour < 12) {
+    //       this.$emit('change', { hour: parseInt(this.hour + 12), suffixTouched: true })
+    //     }
+    //   }
+    // },
     formatHour (hour) {
       const numHour = Number(hour)
       if (this.use12Hour) {
@@ -134,6 +164,9 @@ export default {
         return numHour
       }
       return hour
+    },
+    confirm () {
+      this.$emit('confirm')
     }
   },
 
@@ -152,10 +185,30 @@ export default {
   line-height: 40px;
   border-bottom: 1px solid #F5F5F5;
   border-left: 1px solid #F5F5F5;
-  .vdatetime-time-input{
-    outline: none;
-    height: 22px;
-    border: none;
+  position: relative;
+  .vdatetime-time-input-box {
+     .vdatetime-time-input{
+      outline: none;
+      height: 22px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      width: 100%;
+      border: none;
+      padding-left: 16px;
+    }
+    .icon-clear{
+      display: none;
+      position: absolute;
+      height: 14px;
+      width: 14px;
+      top: 2px;
+      right: 10px;
+      cursor: pointer;
+    }
+    &:hover .icon-clear, &:focus .icon-clear{
+      display: inline-block;
+    }
   }
 }
 .vdatetime-time-picker_container{
@@ -164,7 +217,7 @@ export default {
 }
 .vdatetime-time-picker {
   box-sizing: border-box;
-
+  position: relative;
   &::after {
     content: '';
     display: table;
@@ -226,12 +279,15 @@ export default {
   text-align: center;
   cursor: pointer;
   transition: font-size .3s;
+  &:hover{
+    background: #f5f5f5;
+    color: #333;
+  }
 }
 
 .vdatetime-time-picker__item--selected {
-  color: #333;
-  background: rgba(66,123,255,0.1);
-
+  // color: #333;
+  // background: rgba(66,123,255,0.1);
   // font-size: 32px;
 }
 
@@ -239,5 +295,14 @@ export default {
   opacity: 0.4;
   cursor: default;
   font-size: 20px !important;
+}
+
+.date-active{
+  position: absolute;
+  top: 40px;
+  width: 100%;
+  height: 24px;
+  color: #333;
+  background: rgba(66,123,255,0.1);
 }
 </style>

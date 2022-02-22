@@ -1,13 +1,23 @@
 <template>
   <div class="vdatetime-calendar">
     <div class="vdatetime-calendar__navigation">
+      <div class="vdatetime-calendar__navigation--previous" @click="previousYear">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 61.3 102.8">
+          <path fill="none" stroke="#444" stroke-width="14" stroke-miterlimit="10" d="M56.3 97.8L9.9 51.4 56.3 5"/>
+        </svg>
+      </div>
       <div class="vdatetime-calendar__navigation--previous" @click="previousMonth">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 61.3 102.8">
           <path fill="none" stroke="#444" stroke-width="14" stroke-miterlimit="10" d="M56.3 97.8L9.9 51.4 56.3 5"/>
         </svg>
       </div>
-      <div class="vdatetime-calendar__current--month">{{ `${newYear}年` }} {{ monthName }}</div>
+      <div class="vdatetime-calendar__current--month">{{ `${newYear}年` }} &nbsp;&nbsp;{{ `${monthName}月` }}</div>
       <div class="vdatetime-calendar__navigation--next" @click="nextMonth">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 61.3 102.8">
+          <path fill="none" stroke="#444" stroke-width="14" stroke-miterlimit="10" d="M56.3 97.8L9.9 51.4 56.3 5"/>
+        </svg>
+      </div>
+      <div class="vdatetime-calendar__navigation--next" @click="nextYear">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 61.3 102.8">
           <path fill="none" stroke="#444" stroke-width="14" stroke-miterlimit="10" d="M56.3 97.8L9.9 51.4 56.3 5"/>
         </svg>
@@ -15,12 +25,12 @@
     </div>
     <div class="vdatetime-calendar__month">
       <div class="vdatetime-calendar__month__weekday" v-for="weekday in weekdays" :key="weekday">{{ weekday }}</div>
-      <div class="vdatetime-calendar__month__day" :key="day.number" v-for="day in days" @click="selectDay(day)" :class="{'vdatetime-calendar__month__day--selected': day.selected, 'vdatetime-calendar__month__day--disabled': day.disabled}">
-        <span><span>{{ day.number }}</span></span>
+      <div class="vdatetime-calendar__month__day" :key="i" v-for="(day, i) in days" @click="selectDay(day)" :class="{'vdatetime-calendar__month__day--selected': day.selected, 'vdatetime-calendar__month__day--disabled': day.disabled, 'vdatetime-calendar__month__day--notCurrDay': day.flag !== 'curr' }">
+        <span><span>{{ pad(day.number) }}</span></span>
       </div>
     </div>
     <div class="vdatetime-calendar__button">
-      <span class="button_text">今天</span>
+      <span class="button_text" @click="setCurrDate">今天</span>
       <span class="button_text">时间</span>
     </div>
   </div>
@@ -28,7 +38,7 @@
 
 <script>
 import { DateTime } from 'luxon'
-import { monthDayIsDisabled, monthDays, months, weekdays } from './util'
+import { monthDayIsDisabled, monthDays, months, weekdays, pad } from './util'
 
 export default {
   props: {
@@ -57,7 +67,7 @@ export default {
     },
     weekStart: {
       type: Number,
-      default: 1
+      default: 0
     }
   },
 
@@ -65,7 +75,8 @@ export default {
     return {
       newDate: DateTime.fromObject({ year: this.year, month: this.month,  }),// zone: 'UTC'
       weekdays: weekdays(this.weekStart),
-      months: months()
+      months: months(),
+      pad: pad
     }
   },
 
@@ -80,10 +91,11 @@ export default {
       return this.months[this.newMonth - 1]
     },
     days () {
-      return monthDays(this.newYear, this.newMonth, this.weekStart).map(day => ({
-        number: day,
-        selected: day && this.year === this.newYear && this.month === this.newMonth && this.day === day,
-        disabled: !day || monthDayIsDisabled(this.minDate, this.maxDate, this.newYear, this.newMonth, day)
+      return monthDays(this.newYear, this.newMonth, this.weekStart).map(days => ({
+        number: days.day,
+        flag: days.flag,
+        selected: days.day && days.flag === 'curr' && this.year === this.newYear && this.month === this.newMonth && this.day === days.day,
+        disabled: !days.day || monthDayIsDisabled(this.minDate, this.maxDate, this.newYear, this.newMonth, days.day)
       }))
     }
   },
@@ -93,14 +105,28 @@ export default {
       if (day.disabled) {
         return
       }
-
+      if (day.flag === 'prev') {
+        this.previousMonth()
+      } else if (day.flag === 'next') {
+        this.nextMonth()
+      }
       this.$emit('change', this.newYear, this.newMonth, day.number)
+    },
+    previousYear () {
+      this.newDate = this.newDate.minus({ year: 1 })
+    },
+    nextYear () {
+      this.newDate = this.newDate.plus({ year: 1 })
     },
     previousMonth () {
       this.newDate = this.newDate.minus({ months: 1 })
     },
     nextMonth () {
       this.newDate = this.newDate.plus({ months: 1 })
+    },
+    setCurrDate () {
+      this.newDate = DateTime.local()
+      this.$emit('setCurrDate')
     }
   }
 }
@@ -153,6 +179,9 @@ export default {
 }
 
 .vdatetime-calendar__current--month {
+  color: #333;
+  font-weight: 600;
+  font-size: 12px;
   text-align: center;
   text-transform: capitalize;
 }
@@ -229,6 +258,14 @@ export default {
     color: inherit;
     background: transparent;
   }
+}
+
+.vdatetime-calendar__month__day--notCurrDay{
+  opacity: 0.4;
+  // &:hover > span > span {
+  //   color: inherit;
+  //   background: transparent;
+  // }
 }
 
 .vdatetime-calendar__button{

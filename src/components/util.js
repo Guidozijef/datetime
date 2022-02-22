@@ -12,6 +12,11 @@ export function datetimeFromISO (string) {
 }
 
 export function monthDays (year, month, weekStart) {
+  let prevMonthDate = DateTime.local(year, month - 1, 1)
+  if (month === 1) {
+    prevMonthDate = DateTime.local(year - 1, 12, 1)
+  }
+  const prevSumDay = prevMonthDate.daysInMonth
   const monthDate = DateTime.local(year, month, 1)
   let firstDay = monthDate.weekday - weekStart
 
@@ -23,10 +28,27 @@ export function monthDays (year, month, weekStart) {
     lastDay += 7
   }
 
-  return Array.apply(null, Array(monthDate.daysInMonth + firstDay + lastDay))
-    .map((value, index) =>
-      (index + 1 <= firstDay || index >= firstDay + monthDate.daysInMonth) ? null : (index + 1 - firstDay)
-    )
+  return Array.apply(null, Array(42)) //monthDate.daysInMonth + firstDay + lastDay + 7
+    // .map((value, index) => (index + 1 <= firstDay || index >= firstDay + monthDate.daysInMonth) ? null : (index + 1 - firstDay)
+    // )
+    .map((value, index) => {
+      if (index + 1 - firstDay < 1) {
+        return {
+          day: prevSumDay + (index + 1 - firstDay),
+          flag: 'prev'
+        }
+      } else if ((index + 1 - firstDay) > monthDate.daysInMonth) {
+         return {
+           day: (index + 1 - firstDay) - monthDate.daysInMonth,
+           flag: 'next'
+         }
+      } else {
+        return {
+          day: (index + 1 - firstDay),
+          flag: 'curr'
+        }
+      }
+    })
 }
 
 export function monthDayIsDisabled (minDate, maxDate, year, month, day) {
@@ -62,23 +84,20 @@ export function weekdays (weekStart) {
     weekStart = 6
   }
 
-  let weekDays = Info.weekdays('short').map(weekday => capitalize(weekday))
-
+  let weekDays = Info.weekdays('narrow').map(weekday => capitalize(weekday)) // "narrow", "short", "long".
   weekDays = weekDays.concat(weekDays.splice(0, weekStart))
-  console.log(weekDays)
-  let relfWeekDays = ['日', '一', '二', '三', '四', '五', '六']
-  return relfWeekDays // weekDays
+  return weekDays
 }
 
 export function months () {
-  return Info.months().map(month => capitalize(month))
+  return Info.months('numeric').map(month => capitalize(month)) //  "numeric", "2-digit", "narrow", "short", "long"
 }
 
-export function hours (step) {
+export function hours (step = 1) {
   return Array.apply(null, Array(Math.ceil(24 / step))).map((item, index) => index * step)
 }
 
-export function minutes (step) {
+export function minutes (step = 1) {
   return Array.apply(null, Array(Math.ceil(60 / step))).map((item, index) => index * step)
 }
 

@@ -28,6 +28,7 @@
           :max-datetime="popupMaxDatetime"
           @confirm="confirm"
           @cancel="cancel"
+          @setCurrDate="setCurrDate"
           :auto="auto"
           :week-start="weekStart"
           :flow="flow"
@@ -176,7 +177,7 @@ export default {
             break
           case 'datetime':
           case 'default':
-            format = DateTime.DATETIME_MED
+            format = 'yyyy-MM-dd HH:mm:ss' //DateTime.DATETIME_MED
             break
         }
       }
@@ -254,6 +255,11 @@ export default {
     setValue (event) {
       this.datetime = datetimeFromISO(event.target.value)
       this.emitInput()
+    },
+    setCurrDate() {
+      this.datetime = this.popupDate
+      this.emitInput()
+      // this.close()
     }
   }
 }

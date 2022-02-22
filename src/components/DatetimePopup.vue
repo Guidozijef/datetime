@@ -23,6 +23,7 @@
         <datetime-calendar
           v-if="type === 'datetime'"
           @change="onChangeDate"
+          @setCurrDate="setCurrDate"
           :year="year"
           :month="month"
           :day="day"
@@ -35,11 +36,14 @@
         <datetime-time-picker
           v-if="type === 'datetime'"
           @change="onChangeTime"
+          @confirm="confirm"
+          :year="year"
+          :month="month"
+          :day="day"
           :hour="hour"
           :minute="minute"
+          :second="second"
           :use12-hour="use12Hour"
-          :hour-step="hourStep"
-          :minute-step="minuteStep"
           :min-time="minTime"
           :max-time="maxTime"></datetime-time-picker>
       </div>
@@ -57,7 +61,6 @@
 
 <script>
 import { DateTime } from 'luxon'
-import { createFlowManager, createFlowManagerFromType } from './util'
 import DatetimeCalendar from './DatetimeCalendar'
 import DatetimeTimePicker from './DatetimeTimePicker'
 import DatetimeYearPicker from './DatetimeYearPicker'
@@ -130,14 +133,8 @@ export default {
   },
 
   data () {
-    const flowManager = this.flow
-      ? createFlowManager(this.flow)
-      : createFlowManagerFromType(this.type)
-
     return {
       newDatetime: this.datetime,
-      flowManager,
-      step: flowManager.first(),
       timePartsTouched: []
     }
   },
@@ -166,6 +163,9 @@ export default {
     minute () {
       return this.newDatetime.minute
     },
+    second () {
+      return this.newDatetime.second
+    },
     dateFormatted () {
       return this.newDatetime.toLocaleString({
         month: 'long',
@@ -178,7 +178,7 @@ export default {
         this.minDatetime.year === this.year &&
         this.minDatetime.month === this.month &&
         this.minDatetime.day === this.day
-      ) ? this.minDatetime.toFormat('HH:mm') : null
+      ) ? this.minDatetime.toFormat('HH:mm:ss') : null
     },
     maxTime () {
       return (
@@ -186,55 +186,38 @@ export default {
         this.maxDatetime.year === this.year &&
         this.maxDatetime.month === this.month &&
         this.maxDatetime.day === this.day
-      ) ? this.maxDatetime.toFormat('HH:mm') : null
+      ) ? this.maxDatetime.toFormat('HH:mm:ss') : null
     }
   },
 
   methods: {
-    nextStep () {
-      this.step = this.flowManager.next(this.step)
-      this.timePartsTouched = []
-
-      if (this.step === 'end') {
-        this.$emit('confirm', this.newDatetime)
-      }
-    },
     showYear () {
-      this.step = 'year'
       this.flowManager.diversion('date')
     },
     showMonth () {
-      this.step = 'month'
       this.flowManager.diversion('date')
     },
     confirm () {
-      this.nextStep()
+        this.$emit('confirm', this.newDatetime)
     },
     cancel () {
       this.$emit('cancel')
     },
     onChangeYear (year) {
       this.newDatetime = this.newDatetime.set({ year })
-
-      if (this.auto) {
-        this.nextStep()
-      }
     },
     onChangeMonth (month) {
       this.newDatetime = this.newDatetime.set({ month })
-
-      if (this.auto) {
-        this.nextStep()
-      }
     },
     onChangeDate (year, month, day) {
       this.newDatetime = this.newDatetime.set({ year, month, day })
-
-      if (this.auto) {
-        this.nextStep()
-      }
     },
-    onChangeTime ({ hour, minute, suffixTouched }) {
+    setCurrDate () {
+      let dt = DateTime.local()
+      this.newDatetime = this.newDatetime.set({ year: dt.year, month: dt.month, day: dt.day, hour: dt.hour, minute: dt.minute, second: dt.second })
+      this.$emit('setCurrDate')
+    },
+    onChangeTime ({ hour, minute, second, suffixTouched }) {
       if (suffixTouched) {
         this.timePartsTouched['suffix'] = true
       }
@@ -249,13 +232,9 @@ export default {
         this.timePartsTouched['minute'] = true
       }
 
-      const goNext = this.auto && this.timePartsTouched['hour'] && this.timePartsTouched['minute'] && (
-        this.timePartsTouched['suffix'] ||
-        !this.use12Hour
-      )
-
-      if (goNext) {
-        this.nextStep()
+      if (Number.isInteger(second)) {
+        this.newDatetime = this.newDatetime.set({ second })
+        this.timePartsTouched['second'] = true
       }
     },
     onKeyDown (event) {
@@ -266,7 +245,7 @@ export default {
           break
 
         case KEY_ENTER:
-          this.nextStep()
+          // this.nextStep()
           break
       }
     }

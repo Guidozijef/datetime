@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <datetime v-model="date" :type="'datetime'" :use12Hour="true"></datetime>
+    <datetime v-model="date" :type="'datetime'" :weekStart="0"></datetime>
   </div>
 </template>
 
