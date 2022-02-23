@@ -10,14 +10,17 @@
     </div>
     <div class="date-active"></div>
     <div class="vdatetime-time-picker_container">
-      <div class="vdatetime-time-picker__list vdatetime-time-picker__list--hours" ref="hourList">
-        <div class="vdatetime-time-picker__item" :key="i" v-for="(hour, i) in hours" @click="selectHour(hour)" :class="{'vdatetime-time-picker__item--selected': i === 0, 'vdatetime-time-picker__item--disabled': hour.disabled}">{{ formatHour(hour.number) }}</div>
+      <div class="vdatetime-time-picker__list vdatetime-time-picker__list--hours"  ref="hourList" @scroll="handleScrollHour">
+        <div class="vdatetime-time-picker__item" :key="i" v-for="(hour, i) in hours" @click="selectHour(hour)" :class="{'vdatetime-time-picker__item--selected': currHour == hour.number, 'vdatetime-time-picker__item--disabled': hour.disabled}">{{ formatHour(hour.number) }}</div>
+        <div style="height:192px"></div>
       </div>
-      <div class="vdatetime-time-picker__list vdatetime-time-picker__list--minutes" ref="minuteList">
-        <div class="vdatetime-time-picker__item" :key="i" v-for="(minute, i) in minutes" @click="selectMinute(minute)" :class="{'vdatetime-time-picker__item--selected': i === 0, 'vdatetime-time-picker__item--disabled': minute.disabled}">{{ minute.number }}</div>
+      <div class="vdatetime-time-picker__list vdatetime-time-picker__list--minutes" ref="minuteList" @scroll="handleScrollMinute">
+        <div class="vdatetime-time-picker__item" :key="i" v-for="(minute, i) in minutes" @click="selectMinute(minute)" :class="{'vdatetime-time-picker__item--selected': currMinute == minute.number, 'vdatetime-time-picker__item--disabled': minute.disabled}">{{ minute.number }}</div>
+        <div style="height:192px"></div>
       </div>
-      <div class="vdatetime-time-picker__list vdatetime-time-picker__list--suffix" ref="suffixList">
-        <div class="vdatetime-time-picker__item" :key="i" v-for="(second, i) in seconds" @click="selectSecond(second)" :class="{'vdatetime-time-picker__item--selected': i === 0, 'vdatetime-time-picker__item--disabled': second.disabled}">{{ second.number }}</div>
+      <div class="vdatetime-time-picker__list vdatetime-time-picker__list--suffix" ref="secondList" @scroll="handleScrollSecond">
+        <div class="vdatetime-time-picker__item" :key="i" v-for="(second, i) in seconds" @click="selectSecond(second)" :class="{'vdatetime-time-picker__item--selected': currSecond == second.number, 'vdatetime-time-picker__item--disabled': second.disabled}">{{ second.number }}</div>
+        <div style="height:192px"></div>
       </div>
     </div>
     <div class="vdatetime-time-picker__button">
@@ -67,6 +70,53 @@ export default {
       type: String,
       default: null
     }
+  },
+
+  data () {
+    return {
+      currHour: '00',
+      currMinute: '00',
+      currSecond: '00',
+      hoursTop: this.$refs.hourList,
+      minuteTop: this.$refs.minuteList,
+      secondTop: this.$refs.secondList
+    }
+  },
+
+  mounted () {
+    if (!this.hoursTop){
+      this.hoursTop = this.$refs.hourList
+    }
+    this.hoursTop.scrollTop = this.hour * 32
+    if (!this.minuteTop){
+      this.minuteTop = this.$refs.minuteList
+    }
+    this.minuteTop.scrollTop = this.minute * 32
+    if (!this.secondTop){
+      this.secondTop = this.$refs.secondList
+    }
+    this.secondTop.scrollTop = this.second * 32
+  },
+
+  watch: {
+    hour(hour) {
+        if (!this.hoursTop){
+          this.hoursTop = this.$refs.hourList
+        }
+        this.hoursTop.scrollTop = hour * 32
+    },
+    minute(minute) {
+        if (!this.minuteTop){
+          this.minuteTop = this.$refs.minuteList
+        }
+        this.minuteTop.scrollTop = minute * 32
+    },
+    second(second) {
+        if (!this.secondTop){
+          this.secondTop = this.$refs.secondList
+        }
+        this.secondTop.scrollTop = second * 32
+      }
   },
 
   computed: {
@@ -123,6 +173,10 @@ export default {
       if (hour.disabled) {
         return
       }
+      if (!this.hoursTop){
+        this.hoursTop = this.$refs.hourList
+      }
+      this.hoursTop.scrollTop = parseInt(hour.number) * 32
 
       this.$emit('change', { hour: parseInt(hour.number) })
     },
@@ -130,6 +184,10 @@ export default {
       if (minute.disabled) {
         return
       }
+      if (!this.minuteTop){
+        this.minuteTop = this.$refs.minuteList
+      }
+      this.minuteTop.scrollTop = parseInt(minute.number) * 32
 
       this.$emit('change', { minute: parseInt(minute.number) })
     },
@@ -137,21 +195,14 @@ export default {
       if (second.disabled) {
         return
       }
+      if (!this.secondTop){
+        this.secondTop = this.$refs.secondList
+      }
+      this.secondTop.scrollTop = parseInt(second.number) * 32
 
       this.$emit('change', { second: parseInt(second.number) })
     },
-    // selectSuffix (suffix) {
-    //   if (suffix === 'am') {
-    //     if (this.hour >= 12) {
-    //       this.$emit('change', { hour: parseInt(this.hour - 12), suffixTouched: true })
-    //     }
-    //   }
-    //   if (suffix === 'pm') {
-    //     if (this.hour < 12) {
-    //       this.$emit('change', { hour: parseInt(this.hour + 12), suffixTouched: true })
-    //     }
-    //   }
-    // },
+
     formatHour (hour) {
       const numHour = Number(hour)
       if (this.use12Hour) {
@@ -167,15 +218,41 @@ export default {
     },
     confirm () {
       this.$emit('confirm')
-    }
+    },
+    handleScrollHour (event) {
+      this.hoursTop = event.target
+      let currHour = Math.round(event.target.scrollTop / 32)
+      setTimeout(() => {
+        if (this.currHour === pad(currHour)) {
+          event.target.scrollTop = currHour * 32
+          this.selectHour({ number: this.currHour })
+        }
+      },100)
+      this.currHour = pad(currHour)
+    },
+    handleScrollMinute (event) {
+      this.minuteTop = event.target
+      let currMinute = Math.round(event.target.scrollTop / 32)
+      setTimeout(() => {
+        if (this.currMinute === pad(currMinute)) {
+          event.target.scrollTop = currMinute * 32
+          this.selectMinute({ number: this.currMinute })
+        }
+      },100)
+      this.currMinute = pad(currMinute)
+    },
+    handleScrollSecond (event) {
+      this.secondTop = event.target
+      let currSecond = Math.round(event.target.scrollTop / 32)
+      setTimeout(() => {
+        if (this.currSecond === pad(currSecond)) {
+          event.target.scrollTop = currSecond * 32
+          this.selectSecond({ number: this.currSecond })
+        }
+      },100)
+      this.currSecond = pad(currSecond)
+    },
   },
-
-  mounted () {
-    const selectedHour = this.$refs.hourList.querySelector('.vdatetime-time-picker__item--selected')
-    const selectedMinute = this.$refs.minuteList.querySelector('.vdatetime-time-picker__item--selected')
-    this.$refs.hourList.scrollTop = selectedHour ? selectedHour.offsetTop - 250 : 0
-    this.$refs.minuteList.scrollTop = selectedMinute ? selectedMinute.offsetTop - 250 : 0
-  }
 }
 </script>
 
@@ -286,9 +363,8 @@ export default {
 }
 
 .vdatetime-time-picker__item--selected {
-  // color: #333;
-  // background: rgba(66,123,255,0.1);
-  // font-size: 32px;
+  color: #333333;
+  font-weight: 700;
 }
 
 .vdatetime-time-picker__item--disabled {
