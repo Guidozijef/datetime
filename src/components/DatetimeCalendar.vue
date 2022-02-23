@@ -281,7 +281,7 @@ export default {
   & > span > span,
   &:hover > span > span {
     color: #fff;
-    background: #427BFF;
+    background: #548BD7;
     border-radius: 2px;
   }
 }
@@ -313,7 +313,7 @@ export default {
   padding: 0 16px;
   .button_text{
     cursor: pointer;
-    color: #427BFF;
+    color: #548BD7;
     font-size: 12px;
   }
 }

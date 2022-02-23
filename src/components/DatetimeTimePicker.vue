@@ -315,7 +315,7 @@ export default {
   .button{
     width: 59px;
     height: 24px;
-    background: rgba(66,123,255,1);
+    background: #2A6ECD;
     border-radius: 2px;
     border: none;
     color: #fff;

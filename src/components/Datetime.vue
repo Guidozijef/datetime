@@ -13,7 +13,11 @@
            @click="open"
            @focus="open">
     <input v-if="hiddenName" type="hidden" :name="hiddenName" :value="value" @input="setValue">
-    <slot name="after"></slot>
+    <div class="prefix-box">
+      <slot name="prefix">
+        <svg version="1.1" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M-73.14-73.14h1170.28v1170.28h-1170.28z" fill="#ffffff" p-id="0"></path><path d="M732.16 36.57c24.14 0 43.89 19.75 43.89 43.89v21.94h145.55c37.3 0 68.75 28.53 72.41 64.37l0.73 8.77v746.06c0 40.23-32.91 73.14-73.14 73.14h-819.2c-40.23 0-73.14-32.91-73.14-73.14v-746.06c0-40.23 32.91-73.14 73.14-73.14h147.02v-21.94c0-24.14 19.75-43.89 43.88-43.89 24.14 0 43.89 19.75 43.89 43.89v21.94h351.08v-21.94c0-24.14 19.75-43.89 43.89-43.89z m174.81 374.49h-789.94v495.91h789.94v-495.91z m-219.43 204.8c24.14 0 43.89 19.75 43.89 43.89 0 24.14-19.75 43.89-43.89 43.88h-351.08c-24.14 0-43.89-19.75-43.89-43.88 0-24.14 19.75-43.89 43.89-43.89h351.08z m-438.12-425.69h-132.39v133.12h789.94v-133.12h-130.92v21.94c0 24.14-19.75 43.89-43.89 43.89-24.14 0-43.89-19.75-43.89-43.89v-21.94h-351.08v21.94c0 24.14-19.75 43.89-43.89 43.89-24.14 0-43.89-19.75-43.88-43.89v-21.94z" fill="#dddddd" p-id="1"></path></svg>
+      </slot>
+    </div>
     <transition-group name="vdatetime-fade" tag="div" @click="clickOutside">
       <!-- <div key="overlay" v-if="isOpen && !hideBackdrop" class="vdatetime-overlay" @click.self="clickOutside"></div> -->
       <datetime-popup
@@ -24,7 +28,6 @@
           :datetime="popupDate"
           :phrases="phrases"
           :use12-hour="use12Hour"
-          :hour-step="hourStep"
           :minute-step="minuteStep"
           :min-datetime="popupMinDatetime"
           :max-datetime="popupMaxDatetime"
@@ -106,10 +109,6 @@ export default {
       type: Boolean,
       default: false
     },
-    hourStep: {
-      type: Number,
-      default: 1
-    },
     minuteStep: {
       type: Number,
       default: 1
@@ -129,7 +128,7 @@ export default {
     weekStart: {
       type: Number,
       default () {
-        return weekStart()
+        return 0
       }
     },
     flow: {
@@ -172,10 +171,10 @@ export default {
       if (!format) {
         switch (this.type) {
           case 'date':
-            format = DateTime.DATE_MED
+            format = 'yyyy-MM-dd' // DateTime.DATE_MED
             break
           case 'time':
-            format = DateTime.TIME_24_SIMPLE
+            format = 'HH:mm:ss' // DateTime.TIME_24_SIMPLE
             break
           case 'datetime':
           case 'default':
@@ -267,10 +266,13 @@ export default {
       this.datetime = datetimeFromISO(event.target.value)
       this.emitInput()
     },
+    // 设置时间
     setDateTime(datetime) {
       this.datetime = datetime.toUTC()
       this.emitInput()
-      // this.close()
+      if (this.type === 'date') {
+        this.close()
+      }
     }
   },
   beforeDestroy () {
@@ -306,7 +308,8 @@ export default {
   width: 100%;
   .vdatetime-input{
     outline: none;
-    padding: 0 16px;
+    padding-left: 16px;
+    padding-right: 32px;
     background-color: #fff;
     background-image: none;
     border-radius: 4px;
@@ -316,7 +319,17 @@ export default {
     display: inline-block;
     height: 24px;
     width: 100%;
+    &:hover, &:focus{
+      border: 1px solid #548BD7;
+    }
   }
+}
+
+.prefix-box{
+  position: absolute;
+  right: 10px;
+  width: 15px;
+  top: 3px;
 }
 
 

@@ -1,22 +1,22 @@
 <template>
   <div class="vdatetime-popup">
-    <div class="vdatetime-popup__body">
-      <!-- <datetime-year-picker
-          v-if="step === 'year'"
+    <div class="vdatetime-popup__body" :style="{ 'width': this.popWidth}">
+      <datetime-year-picker
+          v-if="type === 'year'"
           @change="onChangeYear"
           :min-date="minDatetime"
           :max-date="maxDatetime"
           :year="year"></datetime-year-picker>
       <datetime-month-picker
-          v-if="step === 'month'"
+          v-if="type === 'month'"
           @change="onChangeMonth"
           :min-date="minDatetime"
           :max-date="maxDatetime"
           :year="year"
-          :month="month"></datetime-month-picker> -->
+          :month="month"></datetime-month-picker>
       <div class="calendar-container">
         <datetime-calendar
-          v-if="type === 'datetime'"
+          v-if="type === 'datetime' || type === 'date'"
           @change="onChangeDate"
           @setDateTime="setDateTime"
           :year="year"
@@ -29,7 +29,7 @@
       </div>
       <div class="time-container">
         <datetime-time-picker
-          v-if="type === 'datetime'"
+          v-if="type === 'datetime' || type === 'time'"
           @change="onChangeTime"
           @confirm="confirm"
           :year="year"
@@ -94,10 +94,6 @@ export default {
     use12Hour: {
       type: Boolean,
       default: false
-    },
-    hourStep: {
-      type: Number,
-      default: 1
     },
     minuteStep: {
       type: Number,
@@ -182,6 +178,14 @@ export default {
         this.maxDatetime.month === this.month &&
         this.maxDatetime.day === this.day
       ) ? this.maxDatetime.toFormat('HH:mm:ss') : null
+    },
+    popWidth () {
+      let map = {
+        'date': '234px',
+        'time': '180px',
+        'datetime': '414px'
+      }
+      return map[this.type]
     }
   },
 
@@ -276,7 +280,7 @@ export default {
   .vdatetime-popup__body{
     overflow: hidden;
     height: 304px;
-    width: 414px;
+    // width: 414px;
     .calendar-container{
       float: left;
       width: 234px;

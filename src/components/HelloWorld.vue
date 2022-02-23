@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
     <div style="width: 240px">
-      <datetime v-model="date" :type="'datetime'" :weekStart="0"></datetime>
+      <datetime v-model="date" :type="'datetime'"></datetime>
     </div>
   </div>
 </template>
@@ -22,7 +22,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h3 {
   margin: 40px 0 0;
