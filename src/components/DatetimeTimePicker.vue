@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="vdatetime-time-picker__button">
-      <button class="button" @click="confirm">按钮</button>
+      <button class="button" @click="confirm">确定</button>
     </div>
   </div>
 </template>

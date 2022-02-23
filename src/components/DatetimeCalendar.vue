@@ -1,25 +1,45 @@
 <template>
   <div class="vdatetime-calendar">
     <div class="vdatetime-calendar__navigation">
-      <div class="vdatetime-calendar__navigation--previous" @click="previousYear">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 61.3 102.8">
-          <path fill="none" stroke="#444" stroke-width="14" stroke-miterlimit="10" d="M56.3 97.8L9.9 51.4 56.3 5"/>
+      <div class="vdatetime-calendar__navigation--previous-year" @click="previousYear">
+        <svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="Icon/12/控件/左切/normal" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <g>
+                  <rect id="矩形" opacity="0.40114008" x="0" y="0" width="12" height="12"></rect>
+                  <path d="M10.8714989,1.01489719 C11.0252679,1.16866613 11.044489,1.40603237 10.9291623,1.58070064 L10.8714989,1.6512933 L6.5233961,6.00009524 L10.8714989,10.3487067 C11.0252679,10.5024756 11.044489,10.7398419 10.9291623,10.9145101 L10.8714989,10.9851028 C10.71773,11.1388717 10.4803637,11.1580929 10.3056955,11.0427662 L10.2351028,10.9851028 L5.56819805,6.31819805 C5.41442911,6.16442911 5.39520799,5.92706287 5.5105347,5.75239461 L5.56819805,5.68180195 L10.2351028,1.01489719 C10.4108387,0.839161261 10.695763,0.839161261 10.8714989,1.01489719 Z M6.37149891,1.01489719 C6.52526785,1.16866613 6.54448897,1.40603237 6.42916226,1.58070064 L6.37149891,1.6512933 L2.0233961,6.00009524 L6.37149891,10.3487067 C6.52526785,10.5024756 6.54448897,10.7398419 6.42916226,10.9145101 L6.37149891,10.9851028 C6.21772997,11.1388717 5.98036373,11.1580929 5.80569547,11.0427662 L5.73510281,10.9851028 L1.06819805,6.31819805 C0.914429112,6.16442911 0.895207994,5.92706287 1.0105347,5.75239461 L1.06819805,5.68180195 L5.73510281,1.01489719 C5.91083874,0.839161261 6.19576298,0.839161261 6.37149891,1.01489719 Z" id="形状结合" fill="#666666"></path>
+              </g>
+          </g>
         </svg>
       </div>
       <div class="vdatetime-calendar__navigation--previous" @click="previousMonth">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 61.3 102.8">
-          <path fill="none" stroke="#444" stroke-width="14" stroke-miterlimit="10" d="M56.3 97.8L9.9 51.4 56.3 5"/>
+        <svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="Icon/12/控件/左一/normal" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <g>
+                  <rect id="矩形" opacity="0.40114008" x="0" y="0" width="12" height="12"></rect>
+                  <path d="M7.93180195,1.01489719 C8.10753788,0.839161261 8.39246212,0.839161261 8.56819805,1.01489719 C8.74393398,1.19063312 8.74393398,1.47555736 8.56819805,1.6512933 L8.56819805,1.6512933 L4.22009524,6.00009524 L8.56819805,10.3487067 C8.72196699,10.5024756 8.74118811,10.7398419 8.6258614,10.9145101 L8.56819805,10.9851028 C8.39246212,11.1608387 8.10753788,11.1608387 7.93180195,10.9851028 L7.93180195,10.9851028 L3.26489719,6.31819805 C3.08916126,6.14246212 3.08916126,5.85753788 3.26489719,5.68180195 L3.26489719,5.68180195 Z" id="形状结合" fill="#666666"></path>
+              </g>
+          </g>
         </svg>
       </div>
       <div class="vdatetime-calendar__current--month">{{ `${newYear}年` }} &nbsp;&nbsp;{{ `${monthName}月` }}</div>
       <div class="vdatetime-calendar__navigation--next" @click="nextMonth">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 61.3 102.8">
-          <path fill="none" stroke="#444" stroke-width="14" stroke-miterlimit="10" d="M56.3 97.8L9.9 51.4 56.3 5"/>
-        </svg>
+        <svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="控件" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <g id="Icon/12/控件/右一/normal">
+                  <rect id="矩形" opacity="0.40114008" x="0" y="0" width="12" height="12"></rect>
+                  <path d="M4.06819805,1.01489719 L8.73510281,5.68180195 L8.73510281,5.68180195 C8.91083874,5.85753788 8.91083874,6.14246212 8.73510281,6.31819805 L4.06819805,10.9851028 C3.89246212,11.1608387 3.60753788,11.1608387 3.43180195,10.9851028 C3.25606602,10.8093669 3.25606602,10.5244426 3.43180195,10.3487067 L7.78,6.00009524 L3.43180195,1.6512933 C3.25606602,1.47555736 3.25606602,1.19063312 3.43180195,1.01489719 C3.60753788,0.839161261 3.89246212,0.839161261 4.06819805,1.01489719 Z" id="形状结合" fill="#666666"></path>
+              </g>
+          </g>
+      </svg>
       </div>
-      <div class="vdatetime-calendar__navigation--next" @click="nextYear">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 61.3 102.8">
-          <path fill="none" stroke="#444" stroke-width="14" stroke-miterlimit="10" d="M56.3 97.8L9.9 51.4 56.3 5"/>
+      <div class="vdatetime-calendar__navigation--next-year" @click="nextYear">
+        <svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="Icon/12/控件/右切/normal" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <g>
+                  <rect id="矩形" opacity="0.40114008" x="0" y="0" width="12" height="12"></rect>
+                  <path d="M6.31819805,1.01489719 L10.9851028,5.68180195 C11.1608387,5.85753788 11.1608387,6.14246212 10.9851028,6.31819805 L6.31819805,10.9851028 C6.14246212,11.1608387 5.85753788,11.1608387 5.68180195,10.9851028 C5.50606602,10.8093669 5.50606602,10.5244426 5.68180195,10.3487067 L10.03,6.00009524 L5.68180195,1.6512933 C5.50606602,1.47555736 5.50606602,1.19063312 5.68180195,1.01489719 C5.85753788,0.839161261 6.14246212,0.839161261 6.31819805,1.01489719 Z M1.81819805,1.01489719 L6.48510281,5.68180195 C6.66083874,5.85753788 6.66083874,6.14246212 6.48510281,6.31819805 L1.81819805,10.9851028 C1.64246212,11.1608387 1.35753788,11.1608387 1.18180195,10.9851028 C1.00606602,10.8093669 1.00606602,10.5244426 1.18180195,10.3487067 L5.53,6.00009524 L1.18180195,1.6512933 C1.00606602,1.47555736 1.00606602,1.19063312 1.18180195,1.01489719 C1.35753788,0.839161261 1.64246212,0.839161261 1.81819805,1.01489719 Z" id="形状结合" fill="#666666"></path>
+              </g>
+          </g>
         </svg>
       </div>
     </div>
@@ -30,8 +50,8 @@
       </div>
     </div>
     <div class="vdatetime-calendar__button">
-      <span class="button_text" @click="setCurrDate">今天</span>
-      <span class="button_text">时间</span>
+      <span class="button_text" @click="setDateTime">今天</span>
+      <!-- <span class="button_text">时间</span> -->
     </div>
   </div>
 </template>
@@ -124,9 +144,9 @@ export default {
     nextMonth () {
       this.newDate = this.newDate.plus({ months: 1 })
     },
-    setCurrDate () {
+    setDateTime () {
       this.newDate = DateTime.local()
-      this.$emit('setCurrDate')
+      this.$emit('setDateTime', 'currDate')
     }
   }
 }
@@ -152,7 +172,7 @@ export default {
   position: absolute;
   top: 0;
   padding: 0 5px;
-  width: 18px;
+  width: 16px;
   cursor: pointer;
 
   &.svg {
@@ -165,17 +185,33 @@ export default {
   }
 
   &:hover svg path {
-    stroke: #888;
+    // stroke: #888;
   }
 }
 
 .vdatetime-calendar__navigation--previous {
-  left: 25px;
+  left: 30px;
 }
 
 .vdatetime-calendar__navigation--next {
-  right: 25px;
-  transform: scaleX(-1);
+  right: 30px;
+}
+.vdatetime-calendar__navigation--previous-year {
+  left: 14px;
+  position: absolute;
+  top: 0;
+  padding: 0 5px;
+  width: 18px;
+  cursor: pointer;
+}
+
+.vdatetime-calendar__navigation--next-year {
+  right: 14px;
+  position: absolute;
+  top: 0;
+  padding: 0 5px;
+  width: 18px;
+  cursor: pointer;
 }
 
 .vdatetime-calendar__current--month {

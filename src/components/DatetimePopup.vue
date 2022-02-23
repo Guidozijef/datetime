@@ -1,10 +1,5 @@
 <template>
   <div class="vdatetime-popup">
-    <!-- <div class="vdatetime-popup__header">
-      <div class="vdatetime-popup__title" v-if="title">{{ title }}</div>
-      <div class="vdatetime-popup__year" @click="showYear" v-if="type !== 'time'">{{ year }}</div>
-      <div class="vdatetime-popup__date" @click="showMonth" v-if="type !== 'time'">{{ dateFormatted }}</div>
-    </div> -->
     <div class="vdatetime-popup__body">
       <!-- <datetime-year-picker
           v-if="step === 'year'"
@@ -23,7 +18,7 @@
         <datetime-calendar
           v-if="type === 'datetime'"
           @change="onChangeDate"
-          @setCurrDate="setCurrDate"
+          @setDateTime="setDateTime"
           :year="year"
           :month="month"
           :day="day"
@@ -203,39 +198,44 @@ export default {
     cancel () {
       this.$emit('cancel')
     },
+    // 改变年
     onChangeYear (year) {
       this.newDatetime = this.newDatetime.set({ year })
+      this.setDateTime()
     },
+    // 改变月
     onChangeMonth (month) {
       this.newDatetime = this.newDatetime.set({ month })
+      this.setDateTime()
     },
+    // 改变年、月、日事件
     onChangeDate (year, month, day) {
       this.newDatetime = this.newDatetime.set({ year, month, day })
+      this.setDateTime()
     },
-    setCurrDate () {
-      let dt = DateTime.local()
-      this.newDatetime = this.newDatetime.set({ year: dt.year, month: dt.month, day: dt.day, hour: dt.hour, minute: dt.minute, second: dt.second })
-      this.$emit('setCurrDate')
-    },
-    onChangeTime ({ hour, minute, second, suffixTouched }) {
-      if (suffixTouched) {
-        this.timePartsTouched['suffix'] = true
-      }
-
+    // 改变时、分、秒事件
+    onChangeTime ({ hour, minute, second }) {
       if (Number.isInteger(hour)) {
         this.newDatetime = this.newDatetime.set({ hour })
-        this.timePartsTouched['hour'] = true
       }
 
       if (Number.isInteger(minute)) {
         this.newDatetime = this.newDatetime.set({ minute })
-        this.timePartsTouched['minute'] = true
       }
 
       if (Number.isInteger(second)) {
         this.newDatetime = this.newDatetime.set({ second })
-        this.timePartsTouched['second'] = true
       }
+
+      this.setDateTime()
+    },
+    // 设置时间日期并暴露到外面， 有currFlag表示设置当前时间
+    setDateTime (currFlag) {
+      if (currFlag) {
+        let dt = DateTime.local()
+        this.newDatetime = this.newDatetime.set({ year: dt.year, month: dt.month, day: dt.day, hour: dt.hour, minute: dt.minute, second: dt.second })
+      }
+      this.$emit('setDateTime', this.newDatetime)
     },
     onKeyDown (event) {
       switch (event.keyCode) {
@@ -257,13 +257,13 @@ export default {
 .vdatetime-popup {
   box-sizing: border-box;
   z-index: 1000;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  // width: 340px;
-  max-width: calc(100% - 30px);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  position: absolute;
+  top: 30px;
+  // left: 50%;
+  // transform: translate(-50%, -50%);
+  // // width: 340px;
+  // max-width: calc(100% - 30px);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   color: #444;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   line-height: 1.18;
@@ -274,7 +274,9 @@ export default {
     box-sizing: border-box;
   }
   .vdatetime-popup__body{
+    overflow: hidden;
     height: 304px;
+    width: 414px;
     .calendar-container{
       float: left;
       width: 234px;

@@ -1,7 +1,8 @@
 <template>
-  <div class="vdatetime">
+  <div class="vdatetime" ref="vdatetime">
     <slot name="before"></slot>
     <input class="vdatetime-input"
+            ref="input"
            :class="inputClass"
            :style="inputStyle"
            :id="inputId"
@@ -13,9 +14,10 @@
            @focus="open">
     <input v-if="hiddenName" type="hidden" :name="hiddenName" :value="value" @input="setValue">
     <slot name="after"></slot>
-    <transition-group name="vdatetime-fade" tag="div">
-      <div key="overlay" v-if="isOpen && !hideBackdrop" class="vdatetime-overlay" @click.self="clickOutside"></div>
+    <transition-group name="vdatetime-fade" tag="div" @click="clickOutside">
+      <!-- <div key="overlay" v-if="isOpen && !hideBackdrop" class="vdatetime-overlay" @click.self="clickOutside"></div> -->
       <datetime-popup
+          ref="datetimePopup"
           key="popup"
           v-if="isOpen"
           :type="type"
@@ -28,7 +30,7 @@
           :max-datetime="popupMaxDatetime"
           @confirm="confirm"
           @cancel="cancel"
-          @setCurrDate="setCurrDate"
+          @setDateTime="setDateTime"
           :auto="auto"
           :week-start="weekStart"
           :flow="flow"
@@ -198,7 +200,9 @@ export default {
       return this.maxDatetime ? DateTime.fromISO(this.maxDatetime).setZone(this.zone) : null
     }
   },
-
+  mounted () {
+    document.addEventListener('click', this.bodyCloseMenus)
+  },
   methods: {
     emitInput () {
       let datetime = this.datetime ? this.datetime.setZone(this.valueZone) : null
@@ -227,7 +231,14 @@ export default {
       this.close()
     },
     clickOutside () {
-      if (this.backdropClick === true) { this.cancel() }
+      // if (this.backdropClick === true) { this.cancel() }
+    },
+    bodyCloseMenus (e) {
+      this.$nextTick(() => {
+        if (this.$refs.datetimePopup && !this.$refs.datetimePopup.$el.contains(e.target) && this.$refs.vdatetime && this.$refs.input !== e.target) {
+          this.cancel()
+        }
+      })
     },
     newPopupDatetime () {
       let datetime = DateTime.utc().setZone(this.zone).set({ seconds: 0, milliseconds: 0 })
@@ -256,11 +267,14 @@ export default {
       this.datetime = datetimeFromISO(event.target.value)
       this.emitInput()
     },
-    setCurrDate() {
-      this.datetime = this.popupDate
+    setDateTime(datetime) {
+      this.datetime = datetime.toUTC()
       this.emitInput()
       // this.close()
     }
+  },
+  beforeDestroy () {
+    document.removeEventListener('click', this.bodyCloseMenus)
   }
 }
 </script>
@@ -286,4 +300,24 @@ export default {
   background: rgba(0, 0, 0, 0.5);
   transition: opacity .5s;
 }
+
+.vdatetime{
+  position: relative;
+  width: 100%;
+  .vdatetime-input{
+    outline: none;
+    padding: 0 16px;
+    background-color: #fff;
+    background-image: none;
+    border-radius: 4px;
+    border: 1px solid #dcdfe6;
+    box-sizing: border-box;
+    color: #606266;
+    display: inline-block;
+    height: 24px;
+    width: 100%;
+  }
+}
+
+
 </style>

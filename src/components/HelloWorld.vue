@@ -1,6 +1,8 @@
 <template>
   <div class="hello">
-    <datetime v-model="date" :type="'datetime'" :weekStart="0"></datetime>
+    <div style="width: 240px">
+      <datetime v-model="date" :type="'datetime'" :weekStart="0"></datetime>
+    </div>
   </div>
 </template>
 
