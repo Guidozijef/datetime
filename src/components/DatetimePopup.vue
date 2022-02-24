@@ -1,5 +1,5 @@
 <template>
-  <div class="vdatetime-popup">
+  <div class="vdatetime-popup" :style="positionStyle">
     <div class="vdatetime-popup__body" :style="{ 'width': this.popWidth}">
       <datetime-year-picker
           v-if="type === 'year'"
@@ -120,13 +120,21 @@ export default {
     },
     title: {
       type: String
+    },
+    right: {
+      type: Number,
+      default: -295
+    },
+    top: {
+      type: Number,
+      default: 30
     }
   },
 
   data () {
     return {
       newDatetime: this.datetime,
-      timePartsTouched: []
+      timePartsTouched: [],
     }
   },
 
@@ -186,6 +194,12 @@ export default {
         'datetime': '414px'
       }
       return map[this.type]
+    },
+    positionStyle () {
+      return {
+        right: this.right + 'px',
+        top: this.top + 'px',
+      }
     }
   },
 
@@ -262,7 +276,7 @@ export default {
   box-sizing: border-box;
   z-index: 1000;
   position: absolute;
-  top: 30px;
+  // top: 30px;
   // left: 50%;
   // transform: translate(-50%, -50%);
   // // width: 340px;

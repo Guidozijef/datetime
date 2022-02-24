@@ -309,7 +309,6 @@ export default {
   border-top: 1px solid #F5F5F5;
   border-left: 1px solid #F5F5F5;
   height: 40px;
-  line-height: 40px;
   text-align: right;
   padding: 0 16px;
   .button{
@@ -330,9 +329,11 @@ export default {
   height: 224px;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
+  border-right: 1px solid #f5f5f5;
 
   &::-webkit-scrollbar {
     width: 3px;
+    display: none;
   }
 
   &::-webkit-scrollbar-track {
