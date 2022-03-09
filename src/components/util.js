@@ -5,7 +5,7 @@ export function capitalize (string) {
 }
 
 export function datetimeFromISO (string) {
-  const datetime = DateTime.fromISO(string).toUTC()
+  const datetime = DateTime.fromISO(string).setZone('local')//.toUTC()
 
   return datetime.isValid ? datetime : null
 }

@@ -91,9 +91,17 @@ export default {
     }
   },
 
+  watch: {
+    month: {
+        handler () {
+          this.newDate = DateTime.fromObject({ year: this.year, month: this.month, day: this.day })
+        }
+    }
+  },
+
   data () {
     return {
-      newDate: DateTime.fromObject({ year: this.year, month: this.month,  }),// zone: 'UTC'
+      newDate: DateTime.fromObject({ year: this.year, month: this.month, day: this.day }),
       weekdays: weekdays(this.weekStart),
       months: months(),
       pad: pad

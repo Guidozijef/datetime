@@ -99,24 +99,39 @@ export default {
   },
 
   watch: {
-    hour(hour) {
-        if (!this.hoursTop){
-          this.hoursTop = this.$refs.hourList
-        }
-        this.hoursTop.scrollTop = hour * 32
+    hour: {
+      immediate: true,
+      handler(hour = 0) {
+        this.$nextTick(() => {
+          if (!this.hoursTop){
+            this.hoursTop = this.$refs.hourList
+          }
+          this.hoursTop.scrollTop = hour * 32
+        })
+      },
     },
-    minute(minute) {
-        if (!this.minuteTop){
-          this.minuteTop = this.$refs.minuteList
-        }
-        this.minuteTop.scrollTop = minute * 32
+    minute: {
+      immediate: true,
+      handler(minute = 0) {
+        this.$nextTick(() => {
+          if (!this.minuteTop){
+            this.minuteTop = this.$refs.minuteList
+          }
+          this.minuteTop.scrollTop = minute * 32
+        })
+      },
     },
-    second(second) {
-        if (!this.secondTop){
-          this.secondTop = this.$refs.secondList
-        }
-        this.secondTop.scrollTop = second * 32
+    second: {
+      immediate: true,
+      handler(second = 0) {
+        this.$nextTick(() => {
+          if (!this.secondTop){
+            this.secondTop = this.$refs.secondList
+          }
+          this.secondTop.scrollTop = second * 32
+        })
       }
+    }
   },
 
   computed: {
@@ -219,37 +234,53 @@ export default {
     confirm () {
       this.$emit('confirm')
     },
-    handleScrollHour (event) {
-      this.hoursTop = event.target
-      let currHour = Math.round(event.target.scrollTop / 32)
-      setTimeout(() => {
-        if (this.currHour === pad(currHour)) {
-          event.target.scrollTop = currHour * 32
-          this.selectHour({ number: this.currHour })
+    debounce(fun, delay) {
+        return function (...args) {
+            let that = this
+            let _args = args
+            clearTimeout(fun.id)
+            fun.id = setTimeout(function () {
+                fun.call(that, _args)
+            }, delay)
         }
-      },100)
-      this.currHour = pad(currHour)
+    },
+    debounceScrollHour (args) {
+      if (this.currHour === pad(args[1])) {
+        args[0].target.scrollTop = args[1] * 32
+        this.selectHour({ number: this.currHour })
+      }
+    },
+    debounceScrollMinute (args) {
+      if (this.currMinute === pad(args[1])) {
+        args[0].target.scrollTop = args[1] * 32
+        this.selectMinute({ number: this.currMinute })
+      }
+    },
+    debounceScrollSecond (args) {
+      if (this.currSecond === pad(args[1])) {
+        args[0].target.scrollTop = args[1] * 32
+        this.selectSecond({ number: this.currSecond })
+      }
+    },
+    handleScrollHour (event) {
+        this.hoursTop = event.target
+        let currHour = Math.round(event.target.scrollTop / 32)
+        let fn = this.debounce(this.debounceScrollHour, 200)
+        fn(event, currHour)
+        this.currHour = pad(currHour)
     },
     handleScrollMinute (event) {
       this.minuteTop = event.target
       let currMinute = Math.round(event.target.scrollTop / 32)
-      setTimeout(() => {
-        if (this.currMinute === pad(currMinute)) {
-          event.target.scrollTop = currMinute * 32
-          this.selectMinute({ number: this.currMinute })
-        }
-      },100)
+      let fn = this.debounce(this.debounceScrollMinute, 200)
+      fn(event, currMinute)
       this.currMinute = pad(currMinute)
     },
     handleScrollSecond (event) {
       this.secondTop = event.target
       let currSecond = Math.round(event.target.scrollTop / 32)
-      setTimeout(() => {
-        if (this.currSecond === pad(currSecond)) {
-          event.target.scrollTop = currSecond * 32
-          this.selectSecond({ number: this.currSecond })
-        }
-      },100)
+      let fn = this.debounce(this.debounceScrollSecond, 200)
+      fn(event, currSecond)
       this.currSecond = pad(currSecond)
     },
   },

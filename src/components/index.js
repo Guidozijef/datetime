@@ -8,7 +8,7 @@ function plugin (Vue) {
 }
 
 // Install by default if using the script tag
-Vue.use(plugin)
+// Vue.use(plugin)
 
 export default plugin
 
